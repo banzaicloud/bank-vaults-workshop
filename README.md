@@ -1,8 +1,11 @@
 # bank-vaults-workshop
 
-## Setup
+## Infrastructure Setup
 
-1. Copy the content of the Pendrive to your workstation
+You can use the Kubernetes cluster of your choice, this guide walks you through
+to use the one inside a Vagrantbox distributed on the pendrives.
+
+1. Copy the content of the pendrive to your workstation
 2. Open up a terminal and enter that directory where you copied the content.
 3. Install the `vbguest` Vagrant plugin with:
 
@@ -27,14 +30,59 @@
     
     In this case the examples are mounted to `/vagrant/bank-vaults`
 
-7. Add the `Banzai Cloud` Helm chart repository:
+## Banzai Vault Operator and Webhook install
+
+1. Add the `Banzai Cloud` Helm chart repository:
 
     `helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com/`
 
-8. Install the `Banzai Cloud Vault Operator` into the `vault-infra` namespace:
+2. Install the `Banzai Cloud Vault Operator` into the `vault-infra` namespace:
 
      `helm upgrade --install vault-infra banzaicloud-stable/vault-operator --namespace vault-infra`
 
-9. Install the `Vault Secrets Webhook` also to the `vault-infra` namespace:
+3. Install the `Vault Secrets Webhook` also to the `vault-infra` namespace:
 
      `helm upgrade --install vault-secrets-webhook banzaicloud-stable/vault-secrets-webhook --namespace vault-infra`
+
+4. Check that everything has been installed correctly:
+
+     `kubectl get pods -w -n vault-infra`
+
+
+At this point we have a fully working Vault provisioner operator and the secret injecting webhook installed!
+
+# Installing Vault
+
+1. Checkout the workshop repository:
+
+    ```
+    git clone git@github.com:banzaicloud/bank-vaults-workshop.git
+    cd bank-vaults-workshop
+    ```
+
+3. Now can deploy a Vault instance on top of Kubernetes:
+
+    1. Create the RBAC rules for the Vault instance to work properly:
+
+        `kubectl apply -f 01-vault/01-rbac.yaml`
+
+    2. Install the Vault instance itself:
+
+        `kubectl apply -f 01-vault/02-vault.yaml`
+
+    3. Check that all Vault related Pods have been started:
+
+        `kubectl get pods -w`
+
+4. Get the Vault root token, we will use it later on ;)
+
+    `kubectl get secrets vault-unseal-keys -o jsonpath={.data.vault-root} | base64 --decode`
+
+    NOTE on how to access this Vault instance:
+
+        ```
+        kubectl port-forward statefulset/vault 8200 &
+        export VAULT_ADDR="https://127.0.0.1:8200"
+        export VAULT_TOKEN="the token from above"
+        vault secrets list
+        ```
