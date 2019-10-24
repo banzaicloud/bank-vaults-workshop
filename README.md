@@ -17,14 +17,13 @@
     `vagrant up`
 
 6. There are two ways to do this (work in the VM or outside the VM):
+  - a. External: setup `kubectl` to point to the Kubernetes cluster inside the VM:
 
-   a. External: setup `kubectl` to point to the Kubernetes cluster inside the VM:
+    `export KUBECONFIG=$PWD/kubeconfig.yaml`
 
-   `export KUBECONFIG=$PWD/kubeconfig.yaml`
+  - b. Internal: SSH into the VM:
 
-   b. Internal: SSH into the VM:
-
-   `vagrant ssh` 
+    `vagrant ssh` 
 
 7. Add the `Banzai Cloud` Helm chart repository:
 
