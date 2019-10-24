@@ -23,7 +23,7 @@ spec:
       containers:
       - name: alpine
         image: alpine
-        command: ["sh", "-c", "while true; do cat /vault/secrets/aws_credentials; sleep 2; done"]
+        command: ["sh", "-c", "while true; do cat /vault/secrets/aws_credentials; echo; sleep 2; done"]
         resources:
           limits:
             memory: "128Mi"

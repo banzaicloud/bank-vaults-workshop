@@ -82,18 +82,18 @@ At this point we have a fully working Vault provisioner operator and the secret 
 
     NOTE on how to access this Vault instance:
 
-        ```
-        kubectl port-forward statefulset/vault 8200 &
-        export VAULT_ADDR="https://127.0.0.1:8200"
-        export VAULT_TOKEN="the token from above"
-        export VAULT_SKIP_VERIFY=true # Vault has no 127.0.0.1 in it's cert
+    ```
+    kubectl port-forward statefulset/vault 8200 &
+    export VAULT_ADDR="https://127.0.0.1:8200"
+    export VAULT_TOKEN="the token from above"
+    export VAULT_SKIP_VERIFY=true # Vault has no 127.0.0.1 in it's cert
 
-        vault kv list secret/
+    vault kv list secret/
 
-        vault kv get secret/accounts/aws
+    vault kv get secret/accounts/aws
 
-        vault kv get secret/mysql
-        ```
+    vault kv get secret/mysql
+    ```
 
 ## Inject some secrets from Vault!
 
@@ -141,16 +141,22 @@ At this point we have all the components to inject Secrets from Vault into Kuber
 
     Now exec into MySQL and see that the root password works:
     
-    `kubectl exec -it mysql-7c68c847dc-lh4sc bash`
+    `kubectl exec -it deployment/mysql bash`
 
     `mysql -p`
 
     Type `s3cr3t` that was injected from the Vault CR.
 
-4. Inject Secrets with consul-template sidecar:
+4. Inject Secrets with `consul-template` sidecar:
 
     `kubectl apply -f 02-examples/03-ct-deployment.yaml`
 
     `kubectl get pods -w`
+
+    See how the Pod was mutated now:
+
+    `kubectl describe pod -l app.kubernetes.io/name=hello-consul-template`
+
+    Check that it can access the created file filled with secrets from Vault:
 
     `kubectl logs -f deployment/hello-consul-template -c alpine`
