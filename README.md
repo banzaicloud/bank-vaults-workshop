@@ -36,6 +36,8 @@ to use the one inside a Vagrantbox distributed on the pendrives.
 
     `helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com/`
 
+    `helm repo update`
+
 2. Install the `Banzai Cloud Vault Operator` into the `vault-infra` namespace:
 
      `helm upgrade --install vault-infra banzaicloud-stable/vault-operator --namespace vault-infra`
@@ -84,7 +86,13 @@ At this point we have a fully working Vault provisioner operator and the secret 
         kubectl port-forward statefulset/vault 8200 &
         export VAULT_ADDR="https://127.0.0.1:8200"
         export VAULT_TOKEN="the token from above"
-        vault secrets list
+        export VAULT_SKIP_VERIFY=true # Vault has no 127.0.0.1 in it's cert
+
+        vault kv list secret/
+
+        vault kv get secret/accounts/aws
+
+        vault kv get secret/mysql
         ```
 
 ## Inject some secrets from Vault!
@@ -116,6 +124,8 @@ At this point we have all the components to inject Secrets from Vault into Kuber
     `k get secret hello-secrets -o jsonpath={.data.data.AWS_SECRET_ACCESS_KEY} | base64 --decode`
 
 3. Into an existing Helm application (in this case MySQL):
+
+    (Using charts without explicit container.command and container.args)
 
     ```
     helm upgrade --install mysql stable/mysql \
