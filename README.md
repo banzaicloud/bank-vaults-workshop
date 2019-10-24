@@ -89,6 +89,7 @@ At this point we have a fully working Vault provisioner operator and the secret 
 
 ## Inject some secrets from Vault!
 
+At this point we have all the components to inject Secrets from Vault into Kubernetes resources.
 
 1. Inject secrets into a Pod:
 
@@ -99,3 +100,39 @@ At this point we have a fully working Vault provisioner operator and the secret 
     `kubectl describe pod -l app.kubernetes.io/name=hello-secrets`
     
     `kubectl logs -f -l app.kubernetes.io/name=hello-secrets`
+
+    After all, please delete the deployment:
+
+    `kubectl delete -f 02-examples/01-deployment.yaml`
+
+2. Inject secrets into Secrets (from Vault secret to Kubernetes `Secret`):
+
+    `kubectl apply -f 02-examples/02-secret.yaml`
+    
+    `kubectl get secret hello-secrets`
+
+    `k get secret hello-secrets -o jsonpath={.data.AWS_ACCESS_KEY_ID} | base64 --decode`
+
+    `k get secret hello-secrets -o jsonpath={.data.data.AWS_SECRET_ACCESS_KEY} | base64 --decode`
+
+3. Into an existing Helm application (in this case MySQL):
+
+    ```
+    helm upgrade --install mysql stable/mysql \
+      --set mysqlRootPassword=vault:secret/data/mysql#MYSQL_ROOT_PASSWORD \
+      --set mysqlPassword=vault:secret/data/mysql#MYSQL_PASSWORD \
+      --set "podAnnotations.vault\.security\.banzaicloud\.io/vault-addr"=https://vault:8200 \
+      --set "podAnnotations.vault\.security\.banzaicloud\.io/vault-tls-secret"=vault-tls
+    ```
+
+    `kubectl get pods -w`
+
+    `kubectl logs -f deployment/mysql`
+
+    Now exec into MySQL and see that the root password works:
+    
+    `kubectl exec -it mysql-7c68c847dc-lh4sc bash`
+
+    `mysql -p`
+
+    Type `s3cr3t` that was injected from the Vault CR.
