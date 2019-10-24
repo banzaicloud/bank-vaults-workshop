@@ -51,7 +51,7 @@ to use the one inside a Vagrantbox distributed on the pendrives.
 
 At this point we have a fully working Vault provisioner operator and the secret injecting webhook installed!
 
-# Installing Vault
+## Installing Vault
 
 1. Checkout the workshop repository:
 
@@ -86,3 +86,16 @@ At this point we have a fully working Vault provisioner operator and the secret 
         export VAULT_TOKEN="the token from above"
         vault secrets list
         ```
+
+## Inject some secrets from Vault!
+
+
+1. Inject secrets into a Pod:
+
+    `kubectl apply -f 02-examples/01-deployment.yaml`
+    
+    `kubectl get pods -w`
+
+    `kubectl describe pod -l app.kubernetes.io/name=hello-secrets`
+    
+    `kubectl logs -f -l app.kubernetes.io/name=hello-secrets`
