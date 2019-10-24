@@ -107,7 +107,7 @@ At this point we have all the components to inject Secrets from Vault into Kuber
 
     `kubectl describe pod -l app.kubernetes.io/name=hello-secrets`
     
-    `kubectl logs -f -l app.kubernetes.io/name=hello-secrets`
+    `kubectl logs -f deployment/hello-secrets`
 
     After all, please delete the deployment:
 
@@ -146,3 +146,11 @@ At this point we have all the components to inject Secrets from Vault into Kuber
     `mysql -p`
 
     Type `s3cr3t` that was injected from the Vault CR.
+
+4. Inject Secrets with consul-template sidecar:
+
+    `kubectl apply -f 02-examples/03-ct-deployment.yaml`
+
+    `kubectl get pods -w`
+
+    `kubectl logs -f deployment/hello-consul-template -c alpine`
