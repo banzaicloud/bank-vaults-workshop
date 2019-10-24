@@ -58,7 +58,7 @@ At this point we have a fully working Vault provisioner operator and the secret 
 1. Checkout the workshop repository:
 
     ```
-    git clone git@github.com:banzaicloud/bank-vaults-workshop.git
+    git clone https://github.com/banzaicloud/bank-vaults-workshop.git
     cd bank-vaults-workshop
     ```
 
@@ -119,9 +119,9 @@ At this point we have all the components to inject Secrets from Vault into Kuber
     
     `kubectl get secret hello-secrets`
 
-    `k get secret hello-secrets -o jsonpath={.data.AWS_ACCESS_KEY_ID} | base64 --decode`
+    `kubectl get secret hello-secrets -o jsonpath={.data.AWS_ACCESS_KEY_ID} | base64 --decode`
 
-    `k get secret hello-secrets -o jsonpath={.data.data.AWS_SECRET_ACCESS_KEY} | base64 --decode`
+    `kubectl get secret hello-secrets -o jsonpath={.data.AWS_SECRET_ACCESS_KEY} | base64 --decode`
 
 3. Into an existing Helm application (in this case MySQL):
 
@@ -146,6 +146,9 @@ At this point we have all the components to inject Secrets from Vault into Kuber
     `mysql -p`
 
     Type `s3cr3t` that was injected from the Vault CR.
+
+    Remove mysql deployment using helm:
+    `helm delete --purge mysql`
 
 4. Inject Secrets with consul-template sidecar:
 
