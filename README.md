@@ -23,7 +23,9 @@
 
   - b. Internal: SSH into the VM:
 
-    `vagrant ssh` 
+    `vagrant ssh`
+    
+    In this case the examples are mounted to `/vagrant/bank-vaults`
 
 7. Add the `Banzai Cloud` Helm chart repository:
 
